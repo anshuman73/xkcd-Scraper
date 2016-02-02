@@ -6,8 +6,9 @@
 import json
 import urllib
 import os
+from optparse import OptionParser
 
-def main():
+def download_all():
 	print 'Querying Total Number of Images as of now...'
 	total = json.loads(urllib.urlopen('http://xkcd.com/info.0.json').read())['num']
 	print 'Querying complete\n\nTotal of ' + str(total) + ' images found\n\n'
@@ -30,6 +31,16 @@ def main():
 		else:
 			print 'Image' + str(num) + ' - "' + img_metadata['safe_title'] + '" already exists. Skipping...'
 
+def main():
+    parser = OptionParser(usage="usage: python scraper.py [options]")
+    parser.add_option(
+        "-a", "--autostart",
+        action = "store_true",
+        default = False
+    )
+    (options, args) = parser.parse_args()
 
-if raw_input('\nPress Enter to start:') == '':
-	main()
+    if options.autostart or raw_input('\nPress Enter to start:') == '':
+        download_all()
+
+main()
