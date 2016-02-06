@@ -10,9 +10,10 @@ The program will automatically create a folder "images" in the directory from wh
 **For Windows you may have to download Python first from [Python.org](http://python.org). Make sure you download Python 2.7.x**
 
 ## Options
-
--v: Run in verbose mode
--l: Enable logging
--a: Autostart without prompting user
--d: Set download directory
--p: Set filename prefix
+| Option | Action                           |
+| :----: |----------------------------------|
+| -v     | Run in verbose mode              |
+| -l     | Enable logging                   |
+| -a     | Autostart without prompting user |
+| -d     | Set download path                |
+| -p     | Set filename Prefix              |
