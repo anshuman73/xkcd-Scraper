@@ -7,6 +7,20 @@ import json
 import urllib
 import os
 from optparse import OptionParser
+import datetime
+
+verbose = False
+logging = False
+
+def log(string):
+    global verbose
+    global logging
+    if verbose:
+        print string
+    if logging:
+        with open("log", "a") as log_file:
+            date_time = datetime.datetime.now().strftime('%d/%m/%y - %H:%m:%S')
+            log_file.write('{}: {}\n'.format(date_time, string))
 
 def download_image(number, directory, prefix=""):
     url = 'http://xkcd.com/{}/info.0.json'.format(number)
@@ -14,30 +28,39 @@ def download_image(number, directory, prefix=""):
     image_file = '{}{}-{}'.format(prefix, number, img_metadata['safe_title'])
     file_path = '{}/{}'.format(directory, image_file)
     if not os.path.exists(file_path):
-        print 'Downloading image: ' + image_file
+        log('Downloading image: ' + image_file)
         urllib.urlretrieve(img_metadata['img'], file_path)
     else:
-        print 'Image' + image_file + '" already exists. Skipping...'
+        log('Image' + image_file + '" already exists. Skipping...')
 
 def download_all(directory, prefix=""):
-    print 'Querying Total Number of Images as of now...'
+    log('Querying Total Number of Images as of now...')
     total = json.loads(urllib.urlopen('http://xkcd.com/info.0.json').read())['num']
-    print 'Querying complete\n\nTotal of ' + str(total) + ' images found\n\n'
-    print 'Checking if /images directory exists...\n'
+    log('Querying complete\n\nTotal of ' + str(total) + ' images found\n\n')
+    log('Checking if /images directory exists...\n')
     if not os.path.exists(directory):
-        print 'Making directory {}'.format(directory)
+        log('Making directory {}'.format(directory))
         os.makedirs(directory)
     for num in xrange(1, total + 1):
         if num == 404:
-            print '\n\nImage 404 is a pathetic little joke -__- Ignoring...\n\n'
+            log('\n\nImage 404 is a pathetic little joke -__- Ignoring...\n\n')
             continue
         download_image(num, directory, prefix=prefix)
-
 
 def main():
     parser = OptionParser(usage="usage: python scraper.py [options]")
     parser.add_option(
         "-a", "--autostart",
+        action = "store_true",
+        default = False
+    )
+    parser.add_option(
+        "-v", "--verbose",
+        action = "store_true",
+        default = False
+    )
+    parser.add_option(
+        "-l", "--log",
         action = "store_true",
         default = False
     )
@@ -53,12 +76,16 @@ def main():
     )
     (options, args) = parser.parse_args()
 
+    global verbose
+    global logging
+    verbose = options.verbose
+    logging = options.log
+
     #Cleaning directory input - Removing / at the end if it was entered
     if options.directory[-1] == '/':
         options.directory = options.directory[0:-1]
 
     if options.autostart or raw_input('\nPress Enter to start:') == '':
         download_all(options.directory, prefix = options.prefix)
-
 
 main()
