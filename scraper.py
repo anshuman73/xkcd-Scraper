@@ -8,6 +8,7 @@ import urllib
 import os
 from optparse import OptionParser
 import datetime
+import sys
 
 verbose = False
 logging = False
@@ -33,6 +34,20 @@ def download_image(number, directory, prefix=""):
     else:
         log('Image' + image_file + '" already exists. Skipping...')
 
+def update_status_indicator(current, total):
+    global verbose
+    bar_length = 70
+    if not verbose:
+        bar = '[='
+        progress = int(float(current) / float(total) * float(bar_length))
+        bar += '=' * progress
+        bar += ' ' * (bar_length - progress)
+        bar += '] {}/{}'.format(current, total)
+        if total == current:
+            bar += '\n'
+        sys.stdout.write('\r' + bar)
+        sys.stdout.flush()
+
 def download_all(directory, prefix=""):
     log('Querying Total Number of Images as of now...')
     total = json.loads(urllib.urlopen('http://xkcd.com/info.0.json').read())['num']
@@ -46,6 +61,7 @@ def download_all(directory, prefix=""):
             log('\n\nImage 404 is a pathetic little joke -__- Ignoring...\n\n')
             continue
         download_image(num, directory, prefix=prefix)
+        update_status_indicator(num, total)
 
 def main():
     parser = OptionParser(usage="usage: python scraper.py [options]")
