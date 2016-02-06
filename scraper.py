@@ -63,7 +63,7 @@ def download_all(directory, prefix=""):
         download_image(num, directory, prefix=prefix)
         update_status_indicator(num, total)
 
-def main():
+def parse_args():
     parser = OptionParser(usage="usage: python scraper.py [options]")
     parser.add_option(
         "-a", "--autostart",
@@ -90,7 +90,10 @@ def main():
         action = "store",
         default = ""
     )
-    (options, args) = parser.parse_args()
+    return parser.parse_args()
+
+def main():
+    (options, args) = parse_args()
 
     global verbose
     global logging
