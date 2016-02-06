@@ -8,7 +8,7 @@ import urllib
 import os
 from optparse import OptionParser
 
-def download_all(directory):
+def download_all(directory, prefix=""):
     print 'Querying Total Number of Images as of now...'
     total = json.loads(urllib.urlopen('http://xkcd.com/info.0.json').read())['num']
     print 'Querying complete\n\nTotal of ' + str(total) + ' images found\n\n'
@@ -24,7 +24,7 @@ def download_all(directory):
 
         url = base_url % (num)
         img_metadata = json.loads(urllib.urlopen(url).read())
-        image_file = '{}-{}'.format(num, img_metadata['safe_title'])
+        image_file = '{}{}-{}'.format(prefix, num, img_metadata['safe_title'])
         file_path = '{}/{}'.format(directory, image_file)
         if not os.path.exists(file_path):
             print 'Downloading image: ' + image_file
@@ -44,6 +44,11 @@ def main():
         action = "store",
         default = os.getcwd() + '/images'
     )
+    parser.add_option(
+        "-p", "--prefix",
+        action = "store",
+        default = ""
+    )
     (options, args) = parser.parse_args()
 
     #Cleaning directory input - Removing / at the end if it was entered
@@ -51,7 +56,7 @@ def main():
         options.directory = options.directory[0:-1]
 
     if options.autostart or raw_input('\nPress Enter to start:') == '':
-        download_all(options.directory)
+        download_all(options.directory, prefix = options.prefix)
 
 
 main()
